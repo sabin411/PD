@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import { db } from "../../../firebase/clientApp";
-// import { collection, getDocs } from "firebase/firestore";
+import axios from "axios";
 import { Pagination } from "antd";
 import VideoWrapper from "../UiComp/videoWrapper";
 import { LiveVideos } from "../../../db/videos";
@@ -8,22 +7,21 @@ export default function LiveVid({ isBlock }) {
   const [viewVideo, setViewVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(4);
-
+  const [comments, setComments] = useState([{ comment: "nothing to show" }]);
   const [users, setusers] = useState([]);
-  // const usersCollectionRef = collection(db, "users");
-  // const liveVideoRef = firebase.firestore();
 
   useEffect(() => {
-    // const getData = async () => {
-    //   const data = await getDocs(usersCollectionRef);
-    //   console.log(data);
-    // };
-    // getData();
-    setViewVideos(LiveVideos);
+    axios.get("http://localhost:8000/LiveVideos").then((res) => {
+      setViewVideos(res.data);
+    });
+    axios.get(" http://localhost:8000/LiveVideosComments").then((res) => {
+      setComments([res.data]);
+    });
   }, []);
   const onPageChange = (page, pageSize) => {
     setCurrentPage(page);
   };
+
   return (
     <>
       <Pagination
@@ -47,14 +45,27 @@ export default function LiveVid({ isBlock }) {
           paddingBottom: "2rem",
         }}
       >
-        {viewVideo?.map((video, i) => {
-          if (
-            i < currentPageSize * currentPage &&
-            i >= currentPageSize * (currentPage - 1)
-          ) {
-            return <VideoWrapper key={i} isBlock={isBlock} data={video} />;
-          }
-        })}
+        {viewVideo &&
+          viewVideo?.map((video, i) => {
+            if (
+              i < currentPageSize * currentPage &&
+              i >= currentPageSize * (currentPage - 1)
+            ) {
+              return (
+                <VideoWrapper
+                  comments={comments.filter((comment) => {
+                    if (comment.videoId === video.id) {
+                      return true;
+                    }
+                    return false;
+                  })}
+                  key={i}
+                  isBlock={isBlock}
+                  data={video}
+                />
+              );
+            }
+          })}
       </div>
     </>
   );

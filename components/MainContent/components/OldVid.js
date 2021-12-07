@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import VideoWrapper from "../UiComp/videoWrapper";
-import { recordedVid } from "../../../db/videos";
+import axios from "axios";
 import { Pagination } from "antd";
 export default function OldVid() {
   const [viewVideo, setViewVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(4);
   const [prevCurrentPage, setPrevCurrentPage] = useState(0);
+  const videoStatus = "OldVideos";
 
   useEffect(() => {
-    setViewVideos(recordedVid);
+    axios.get(`http://localhost:8000/OldVideos`).then((res) => {
+      setViewVideos(res.data);
+    });
   }, []);
   const onPageChange = (page, pageSize) => {
     setCurrentPage(page);
@@ -42,7 +45,14 @@ export default function OldVid() {
             i < currentPageSize * currentPage &&
             i >= currentPageSize * (currentPage - 1)
           ) {
-            return <VideoWrapper key={i} isBlock={true} data={video} />;
+            return (
+              <VideoWrapper
+                videoStatus={videoStatus}
+                key={i}
+                isBlock={true}
+                data={video}
+              />
+            );
           }
         })}
       </div>

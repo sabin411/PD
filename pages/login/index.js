@@ -1,24 +1,37 @@
-import { Form, Input, Button, Checkbox } from "antd";
+import { Form, Input, Button, Checkbox, Card } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import axios from "axios";
 export default function Login() {
-  const onFinish = async (values) => {};
-
+  const [totalUsers, setTotalUsers] = useState();
+  const [userId, setUserId] = useState(0);
+  const [authorizedUser, setAuthorizedUsere] = useState();
+  const router = useRouter();
+  useEffect(() => {
+    axios.get("http://localhost:8000/users").then((res) => {
+      setTotalUsers([...res.data]);
+    });
+  }, []);
+  const finishHandler = async (values) => {
+    totalUsers.forEach((item) => {
+      if (item.email === values.email && item.password === values.password) {
+        setAuthorizedUsere(item);
+        localStorage.setItem("user", JSON.stringify(item));
+        router.push({
+          pathname: "/",
+          query: { ...item },
+        });
+      }
+    });
+  };
+  console.log(totalUsers);
   return (
     <>
-      <div
-        className="form-wrapper"
-        style={{
-          width: "100%",
-          height: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div className="form-container" style={{ width: 400, height: "auto" }}>
-          <h3>Login</h3>
+      <div className="site-card-border-less-wrapper">
+        <Card title="Login" bordered={false} style={{ width: 450 }}>
           <Form
+            onFinish={finishHandler}
             style={{
               marginTop: 20,
             }}
@@ -27,20 +40,19 @@ export default function Login() {
             initialValues={{
               remember: true,
             }}
-            onFinish={onFinish}
           >
             <Form.Item
-              name="username"
+              name="email"
               rules={[
                 {
                   required: true,
-                  message: "Please input your Username!",
+                  message: "Please input your email!",
                 },
               ]}
             >
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Username"
+                placeholder="Email"
                 size="large"
               />
             </Form.Item>
@@ -62,9 +74,8 @@ export default function Login() {
             </Form.Item>
             <Form.Item>
               <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>Remember me</Checkbox>
+                <Checkbox rules={[{ required: true }]}>Remember me</Checkbox>
               </Form.Item>
-
               <a
                 style={{
                   display: "inline-block",
@@ -92,20 +103,17 @@ export default function Login() {
               Or <a href="">register now!</a>
             </Form.Item>
           </Form>
-        </div>
+        </Card>
       </div>
+
       <style jsx>
         {`
-          .form-container {
-            border: 1px solid gray;
-            padding: 2rem 2rem;
-            border-radius: 10px;
-          }
-          .form-container h3 {
-            font-size: 23px;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            text-align: center;
+          .site-card-border-less-wrapper {
+            background-color: #ececec;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         `}
       </style>

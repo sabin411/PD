@@ -1,20 +1,41 @@
 import { Card, Avatar, Input, Divider, Form, Button, message } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import cuid from "cuid";
 import Image from "next/image";
 import { CheckCircleTwoTone } from "@ant-design/icons";
+import { LiveVideos } from "../../../db/videos";
+import axios from "axios";
 
-export default function VideoWrapper({ data, isBlock }) {
+export default function VideoWrapper({ data, isBlock, videoStatus }) {
   const { Meta } = Card;
   const { TextArea } = Input;
   const [form] = Form.useForm();
   const [isVisible, setIsVisible] = useState(false);
+  const [cmnt, setCmnt] = useState([]);
+
+  useEffect(() => {
+    setCmnt(data.comments);
+  }, []);
+
   const handleVisibility = () => {
     setIsVisible(!isVisible);
   };
-  const onFinish = (value) => {
-    console.log(value);
-    message.success("Submit success!");
-    form.resetFields();
+  const onFinish = async (value) => {
+    let newComment = [...cmnt, value];
+    console.log(newComment);
+    await axios
+      .put(`http://localhost:8000/LiveVideos/${data.id}`, {
+        params: newComment,
+      })
+      .then((res) => console.log(res));
+    // await axios
+    //   .delete(`http://localhost:8000/LiveVideos/${data.id}/comments/`)
+    //   .then((res) =>
+    //     axios.post(`http://localhost:8000/LiveVideos/${data.id}`, {
+    //       comments: newComment,
+    //     })
+    //   )
+    //   .catch((err) => console.log(err));
   };
   return (
     <>
@@ -96,7 +117,7 @@ export default function VideoWrapper({ data, isBlock }) {
           />
           {data.comments?.map((comment) => (
             <>
-              <div>
+              <div key={comment.id}>
                 <Avatar
                   icon={<Image src="/default.png" width="50" height="50" />}
                 />

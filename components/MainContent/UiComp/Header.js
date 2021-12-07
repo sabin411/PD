@@ -3,10 +3,17 @@ import Image from "next/image";
 import { Menu, Row, Col, Dropdown } from "antd";
 
 export default function Header({ user }) {
+  console.log(user);
   const menu = (
     <Menu>
       <Menu.Item>
-        <a rel="noopener noreferrer" href="/api/auth/logout">
+        <a
+          rel="noopener noreferrer"
+          href="/api/auth/logout"
+          onClick={() => {
+            localStorage.removeItem("user");
+          }}
+        >
           Logout
         </a>
       </Menu.Item>
@@ -121,7 +128,7 @@ export default function Header({ user }) {
                     height: "100%",
                     width: "100%",
                   }}
-                  src={user?.picture}
+                  src={user?.picture ?? "/default.png"}
                   alt=""
                 />{" "}
               </div>
