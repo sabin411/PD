@@ -1,31 +1,67 @@
-import { Form, Input, Button, Checkbox, Card } from "antd";
+import { Form, Input, Button, Checkbox, Card, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import SelectUser from "../../components/MainContent/UiComp/SelectUser";
 export default function Login() {
   const [totalUsers, setTotalUsers] = useState();
   const [userId, setUserId] = useState(0);
   const [authorizedUser, setAuthorizedUsere] = useState();
+  const [type, setType] = useState("norm-user");
   const router = useRouter();
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
+    setVisible(true);
     axios.get("http://localhost:8000/users").then((res) => {
       setTotalUsers([...res.data]);
     });
   }, []);
+  function handleOk(value) {
+    setType(value);
+    setVisible(false);
+  }
+  function handleCancel() {
+    setVisible(true);
+  }
   const finishHandler = async (values) => {
-    totalUsers.forEach((item) => {
-      if (item.email === values.email && item.password === values.password) {
-        setAuthorizedUsere(item);
-        localStorage.setItem("user", JSON.stringify(item));
-        router.push({
-          pathname: "/",
-          query: { ...item },
-        });
+    if (
+      type === "admin" &&
+      values.email === "sabinadmin@gmail.com" &&
+      values.password === "password123"
+    ) {
+      setAuthorizedUsere({ ...values, type: "admin" });
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...values, type: "admin" })
+      );
+      router.push({
+        pathname: "/",
+        query: { ...values, type: "admin" },
+      });
+      message.success("Welcome Admin!");
+    } else {
+      if (type === "admin") {
+        message.error("The admin's username or password is not correct");
       }
-    });
+    }
+    if (type === "norm-user") {
+      totalUsers.forEach((item) => {
+        if (item.email === values.email && item.password === values.password) {
+          setAuthorizedUsere({ ...item, type: "norm-user" });
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ ...item, type: "norm-user" })
+          );
+          router.push({
+            pathname: "/",
+            query: { ...item, type: "norm-user" },
+          });
+          message.success(`Welcome again ${item.username}`);
+        }
+      });
+    }
   };
-  console.log(totalUsers);
   return (
     <>
       <div className="site-card-border-less-wrapper">
@@ -117,6 +153,11 @@ export default function Login() {
           }
         `}
       </style>
+      <SelectUser
+        isModalVisible={visible}
+        handleOk={handleOk}
+        onCancel={handleCancel}
+      />
     </>
   );
 }

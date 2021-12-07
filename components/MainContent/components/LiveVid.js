@@ -2,20 +2,16 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Pagination } from "antd";
 import VideoWrapper from "../UiComp/videoWrapper";
-import { LiveVideos } from "../../../db/videos";
 export default function LiveVid({ isBlock }) {
   const [viewVideo, setViewVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(4);
-  const [comments, setComments] = useState([{ comment: "nothing to show" }]);
+
   const [users, setusers] = useState([]);
 
   useEffect(() => {
     axios.get("http://localhost:8000/LiveVideos").then((res) => {
       setViewVideos(res.data);
-    });
-    axios.get(" http://localhost:8000/LiveVideosComments").then((res) => {
-      setComments([res.data]);
     });
   }, []);
   const onPageChange = (page, pageSize) => {
@@ -53,12 +49,7 @@ export default function LiveVid({ isBlock }) {
             ) {
               return (
                 <VideoWrapper
-                  comments={comments.filter((comment) => {
-                    if (comment.videoId === video.id) {
-                      return true;
-                    }
-                    return false;
-                  })}
+                  videoType={"LiveComments"}
                   key={i}
                   isBlock={isBlock}
                   data={video}
@@ -70,12 +61,3 @@ export default function LiveVid({ isBlock }) {
     </>
   );
 }
-
-export const getServerSideProps = async ({ params }) => {
-  const { username } = params;
-  const profile = await getProfileData(username);
-  if (!profile) {
-    return { notFound: true };
-  }
-  return { props: { data: { username, profile } } };
-};

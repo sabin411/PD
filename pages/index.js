@@ -12,7 +12,6 @@ export default function Home() {
   const [userDetail, setUserDetail] = useState({});
   const [isDrawerVisibile, setIsDrawerVisible] = useState(false);
   const router = useRouter();
-  console.log(user, "user is here");
   // will handle the visibility of add user modal
   const showDrawer = () => {
     setIsDrawerVisible(true);
@@ -22,22 +21,21 @@ export default function Home() {
   };
   useEffect(() => {
     if (router.query.length > 0) {
-      setUserDetail({ ...router.query, type: "admin" });
+      setUserDetail({ ...router.query });
       return;
     }
     if (localStorage.getItem("user")) {
+      console.log(localStorage.getItem("user"));
       setUserDetail({
         ...JSON.parse(localStorage.getItem("user")),
-        type: "admin",
       });
       return;
     }
     if (user) {
-      setUserDetail({ ...user, type: "admin" });
+      setUserDetail({ ...user, type: "norm-user" });
     }
   }, [user, router.query]);
-  console.log(userDetail, user, "baka");
-  if (!userDetail.username && !user) {
+  if (!userDetail.email && !user) {
     return (
       <>
         <div className="login-page_container">
@@ -73,7 +71,15 @@ export default function Home() {
                     </Link>
                   </div>
                   <div className="normal-signup">
-                    <button onClick={() => {}}>Register</button>
+                    <a
+                      href="/"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        router.push("/signup");
+                      }}
+                    >
+                      Register
+                    </a>
                   </div>
                 </div>
                 <div className="google-login">
@@ -167,13 +173,13 @@ export default function Home() {
     );
   }
   if (
-    (userDetail?.username && userDetail.type === "norm-user") ||
+    (userDetail?.email && userDetail.type === "norm-user") ||
     (user && userDetail.type === "norm-user")
   ) {
     return <NormUser user={userDetail} isLoading={isLoading} />;
   }
   if (
-    (userDetail?.username && userDetail.type === "admin") ||
+    (userDetail?.email && userDetail.type === "admin") ||
     (user && userDetail.type === "admin")
   ) {
     return <Admin user={userDetail} />;

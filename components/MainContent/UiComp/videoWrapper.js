@@ -3,39 +3,44 @@ import { useEffect, useState } from "react";
 import cuid from "cuid";
 import Image from "next/image";
 import { CheckCircleTwoTone } from "@ant-design/icons";
-import { LiveVideos } from "../../../db/videos";
 import axios from "axios";
 
-export default function VideoWrapper({ data, isBlock, videoStatus }) {
+export default function VideoWrapper({
+  videoType,
+  data,
+  isBlock,
+  videoStatus,
+}) {
   const { Meta } = Card;
   const { TextArea } = Input;
   const [form] = Form.useForm();
   const [isVisible, setIsVisible] = useState(false);
-  const [cmnt, setCmnt] = useState([]);
-
+  const [specificComment, setSpecificComment] = useState([]);
+  // to get comments
+  const getComments = async () => {
+    await axios.get(`http://localhost:8000/${videoType}`).then((res) => {
+      setSpecificComment([...res.data]);
+    });
+  };
   useEffect(() => {
-    setCmnt(data.comments);
+    getComments();
   }, []);
 
   const handleVisibility = () => {
     setIsVisible(!isVisible);
   };
   const onFinish = async (value) => {
-    let newComment = [...cmnt, value];
-    console.log(newComment);
     await axios
-      .put(`http://localhost:8000/LiveVideos/${data.id}`, {
-        params: newComment,
+      .post(`http://localhost:8000/${videoType}`, {
+        id: cuid(),
+        vidId: data.id,
+        videoType: `${videoType}`,
+        comment: value.comment,
       })
-      .then((res) => console.log(res));
-    // await axios
-    //   .delete(`http://localhost:8000/LiveVideos/${data.id}/comments/`)
-    //   .then((res) =>
-    //     axios.post(`http://localhost:8000/LiveVideos/${data.id}`, {
-    //       comments: newComment,
-    //     })
-    //   )
-    //   .catch((err) => console.log(err));
+      .then(() => {
+        form.resetFields();
+        getComments();
+      });
   };
   return (
     <>
@@ -67,8 +72,7 @@ export default function VideoWrapper({ data, isBlock, videoStatus }) {
           {data.channel} <CheckCircleTwoTone twoToneColor="#2d728f" />{" "}
         </span>
         <button onClick={handleVisibility} className="comments">
-          {data.comments?.length} Comment
-          {data.comments?.length === 1 ? "" : "s"}
+          Comments
         </button>
         <div
           className={`comment-wrapper ${isVisible ? "active" : ""}`}
@@ -115,23 +119,27 @@ export default function VideoWrapper({ data, isBlock, videoStatus }) {
               margin: ".5rem 0",
             }}
           />
-          {data.comments?.map((comment) => (
-            <>
-              <div key={comment.id}>
-                <Avatar
-                  icon={<Image src="/default.png" width="50" height="50" />}
-                />
-                <h3 style={{ marginLeft: ".3rem" }}>{comment.user}</h3>
-                <p>{comment.comment}</p>
-              </div>
+          {specificComment?.map((comment) => {
+            if (comment.vidId === data.id) {
+              return (
+                <>
+                  <div key={comment.id}>
+                    <Avatar
+                      icon={<Image src="/default.png" width="50" height="50" />}
+                    />
+                    <h3 style={{ marginLeft: ".3rem" }}>{comment.user}</h3>
+                    <p>{comment.comment}</p>
+                  </div>
 
-              <Divider
-                style={{
-                  margin: ".5rem 0",
-                }}
-              />
-            </>
-          ))}
+                  <Divider
+                    style={{
+                      margin: ".5rem 0",
+                    }}
+                  />
+                </>
+              );
+            }
+          })}
         </div>
       </Card>
       <style jsx>

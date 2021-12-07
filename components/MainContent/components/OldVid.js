@@ -47,9 +47,10 @@ export default function OldVid() {
           ) {
             return (
               <VideoWrapper
+                videoType={"RecordComments"}
                 videoStatus={videoStatus}
                 key={i}
-                isBlock={true}
+                isBlock={false}
                 data={video}
               />
             );

@@ -3,7 +3,6 @@ import Image from "next/image";
 import { Menu, Row, Col, Dropdown } from "antd";
 
 export default function Header({ user }) {
-  console.log(user);
   const menu = (
     <Menu>
       <Menu.Item>
@@ -133,7 +132,9 @@ export default function Header({ user }) {
                 />{" "}
               </div>
               <span className="username-name">
-                {user?.given_name ?? "User"}
+                {user?.type === "admin"
+                  ? "Admin"
+                  : user?.given_name || user?.username}
               </span>
             </div>
           </Dropdown>

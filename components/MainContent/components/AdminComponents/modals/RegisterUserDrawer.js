@@ -7,7 +7,6 @@ import {
   Row,
   Input,
   Select,
-  DatePicker,
   Space,
   message,
 } from "antd";
@@ -253,7 +252,6 @@ export default function RegisterUserDrawer({
     message.success("User added successfully");
     form.resetFields();
   };
-  console.log(users, userCount);
 
   return (
     <Drawer
