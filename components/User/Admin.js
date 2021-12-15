@@ -6,7 +6,6 @@ export default function NormUser({ user, isLoading }) {
   const { Main, Footer, Content } = Layout;
   const [isBlock, setIsBlock] = useState(false);
 
-  console.log(user, isLoading);
   const myLoader = ({ src, width, quality }) => {
     return `https://example.com/${src}?w=${width}&q=${quality || 75}`;
   };

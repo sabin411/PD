@@ -12,6 +12,7 @@ import {
 } from "antd";
 // axios thirdparty
 import axios from "axios";
+import cuid from "cuid";
 import React, { useState, useEffect } from "react";
 
 const { Option } = Select;
@@ -231,21 +232,14 @@ export default function RegisterUserDrawer({
     "Zambia",
     "Zimbabwe",
   ];
-  // useEffect
-  useEffect(() => {
-    axios.get("http://localhost:8000/users").then((res) => {
-      setUserCount(res.data.length);
-      setUsers({ id: userCount + 1 });
-    });
-  }, [userCount]);
+
   //   handle finiseh
   const handleFinish = (value) => {
-    let updatedUsers = { ...users, ...value };
+    let updatedUsers = { id: cuid(), ...value };
     axios
       .post("http://localhost:8000/users", { ...updatedUsers })
       .then((res) => {
         setUsers({});
-        setUserCount(res.data.id + 1);
         refreshTable();
       });
 

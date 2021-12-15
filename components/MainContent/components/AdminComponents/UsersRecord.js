@@ -7,6 +7,7 @@ import {
   Button,
   Form,
   Typography,
+  message,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -53,23 +54,33 @@ export default function EditableTable() {
   const [editingKey, setEditingKey] = useState("");
   const [originData, setOriginalData] = useState([]);
   const [isDrawerVisibile, setIsDrawerVisible] = useState(false);
-
+  let mappedDAta = [];
   useEffect(() => {
     axios.get(" http://localhost:8000/users").then((res) => {
-      setData(res.data);
+      res.data.forEach((item, i) => {
+        let conservedId = item.id;
+        delete item.id;
+        mappedDAta.push({ sn: i + 1, ...item, id: conservedId });
+      });
+      mappedDAta && setData(mappedDAta);
     });
   }, []);
 
   const refresh = () => {
+    mappedDAta = [];
     axios.get(" http://localhost:8000/users").then((res) => {
-      setData(res.data);
+      res.data.forEach((item, i) => {
+        let conservedId = item.id;
+        delete item.id;
+        mappedDAta.push({ sn: i + 1, ...item, id: conservedId });
+      });
+      mappedDAta && setData(mappedDAta);
     });
   };
 
   const isEditing = (record) => record.id === editingKey;
 
   const edit = (record) => {
-    console.log(record);
     form.setFieldsValue({
       ...record,
     });
@@ -89,7 +100,6 @@ export default function EditableTable() {
       if (index > -1) {
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row });
-        console.log(id, newData[index], "index");
         setData(newData);
         // !posting data into json database
         await axios.put(`http://localhost:8000/users/${id}`, newData[index]);
@@ -104,7 +114,7 @@ export default function EditableTable() {
         setEditingKey("");
       }
     } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
+      message.error(errInfo);
     }
   };
   // handles delete function
@@ -129,7 +139,7 @@ export default function EditableTable() {
         setEditingKey("");
       }
     } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
+      message.error(errInfo);
     }
   };
   // will handle the visibility of add user modal
@@ -142,8 +152,8 @@ export default function EditableTable() {
 
   const columns = [
     {
-      title: "User Id",
-      dataIndex: "id",
+      title: "S.N",
+      dataIndex: "sn",
       width: "5%",
       editable: false,
     },

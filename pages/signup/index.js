@@ -231,20 +231,12 @@ export default function Signup() {
     "Zambia",
     "Zimbabwe",
   ];
-  // useEffect
-  useEffect(() => {
-    axios.get("http://localhost:8000/users").then((res) => {
-      // todo setUserCount(res.data.length);
-      setUsers({ id: cuid() });
-    });
-  }, []);
 
   const handleFinish = (value) => {
-    let updatedUsers = { ...users, ...value };
+    let updatedUsers = { id: cuid(), ...value };
     axios
       .post("http://localhost:8000/users", { ...updatedUsers })
       .then((res) => {
-        console.log(res.data);
         setUsers({});
         localStorage.setItem(
           "user",

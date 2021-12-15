@@ -90,11 +90,12 @@
   ],
   "users": [
     {
-      "id": 1,
-      "username": "sabin411",
+      "sn": 1,
+      "username": "sabinStha",
       "email": "sherasabin411@gmail.com",
       "password": "password123",
-      "country": "nepal, banepa baka"
+      "country": "nepal, banepa baka",
+      "id": 1
     },
     {
       "id": 2,
@@ -116,6 +117,27 @@
       "email": "abiral@gmail.com",
       "password": "test",
       "country": "Algeria"
+    },
+    {
+      "id": 6,
+      "username": "testSabin",
+      "email": "test@gmail.com",
+      "password": "Admin@12345",
+      "country": "New Zealand"
+    },
+    {
+      "id": "ckx7oz6m000002y6ez17o352o",
+      "username": "manish",
+      "email": "manishfiberknot@gmail.com",
+      "password": "password",
+      "country": "Albania"
+    },
+    {
+      "id": "ckx7p1roz00012y6ei4yrvpur",
+      "username": "gaurab",
+      "email": "gaurab@gmail.com",
+      "password": "test123",
+      "country": "Albania"
     }
   ],
   "LiveComments": [],
